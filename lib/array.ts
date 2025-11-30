@@ -1,24 +1,28 @@
 export function sum(arr: Iterable<number>) {
-    return [...arr].reduce((acc, val) => acc + val, 0);
+    let sum = 0;
+    for (const val of arr) sum += val;
+    return sum;
 }
 
 export function product(arr: Iterable<number>) {
-    return [...arr].reduce((acc, val) => acc * val, 1);
+    let prod = 1;
+    for (const val of arr) prod *= val;
+    return prod;
 }
 
 export function max(arr: Iterable<number>) {
-    return Math.max(...arr);
+    return [...arr].reduce((acc, val) => Math.max(acc, val), -Infinity);
 }
 
 export function min(arr: Iterable<number>) {
-    return Math.min(...arr);
+    return [...arr].reduce((acc, val) => Math.min(acc, val), Infinity);
 }
 
 export function freq<TEl>(arr: TEl[]) {
     return arr.reduce((acc, val) => acc.set(val, 1 + (acc.get(val) || 0)), new Map<TEl, number>());
 }
 
-export function dedup(arr: Iterable<number>) {
+export function dedup<TEl>(arr: Iterable<TEl>) {
     return [...new Set(arr)];
 }
 
