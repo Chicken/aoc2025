@@ -4,5 +4,8 @@
         "indentWidth": 4,
         "useTabs": false,
         "singleQuote": false
+    },
+    "imports": {
+        "@/": "./lib/"
     }
 }
