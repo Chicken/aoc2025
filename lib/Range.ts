@@ -98,6 +98,10 @@ export class Range {
     *iterate(stepSize = 1) {
         for (let i = this.start; i < this.end; i += stepSize) yield i;
     }
+
+    [Symbol.iterator]() {
+        return this.iterate();
+    }
 }
 
 export class RangeSet {
