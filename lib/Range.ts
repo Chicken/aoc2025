@@ -1,4 +1,4 @@
-import { max, min, sortAsc } from "./array.ts";
+import { max, min, sortAsc, sum } from "./array.ts";
 
 export type RangeEquivalent = Range | [number, number];
 
@@ -35,8 +35,18 @@ export class Range {
         else return new Range(range);
     }
 
+    /**
+     * 1 -> 5 = 4
+     */
     get length() {
         return this.end - this.start;
+    }
+
+    /**
+     * 1,2,3,4,5 = 5
+     */
+    get size() {
+        return this.length + 1;
     }
 
     isValid() {
@@ -67,7 +77,7 @@ export class Range {
         if (!this.intersects(otherRange)) return null;
         return new Range(
             Math.max(this.start, otherRange.start),
-            Math.min(this.end, otherRange.end)
+            Math.min(this.end, otherRange.end),
         );
     }
 
@@ -76,7 +86,7 @@ export class Range {
         if (!this.intersects(otherRange)) return null;
         return new Range(
             Math.min(this.start, otherRange.start),
-            Math.max(this.end, otherRange.end)
+            Math.max(this.end, otherRange.end),
         );
     }
 
@@ -95,8 +105,11 @@ export class Range {
         throw new Error("unreachable");
     }
 
+    /**
+     * inclusive of last point
+     */
     *iterate(stepSize = 1) {
-        for (let i = this.start; i < this.end; i += stepSize) yield i;
+        for (let i = this.start; i <= this.end; i += stepSize) yield i;
     }
 
     [Symbol.iterator]() {
@@ -105,10 +118,9 @@ export class Range {
 }
 
 export class RangeSet {
-    public ranges: Range[];
+    public ranges: Range[] = [];
 
     constructor(ranges: Range[] = []) {
-        this.ranges = [];
         for (const range of ranges) this.add(range);
     }
 
@@ -122,8 +134,30 @@ export class RangeSet {
     /**
      * total length of all ranges
      */
+    get length() {
+        return sum(this.toMergedSet().ranges.map((r) => r.length));
+    }
+
+    /**
+     * size of merged area
+     */
     get size() {
-        return this.ranges.reduce((acc, r) => acc + r.length, 0);
+        return sum(this.toMergedSet().ranges.map((r) => r.size));
+    }
+
+    toMergedSet() {
+        const ranges = [...this.ranges];
+        const merged = [];
+        while (ranges.length > 0) {
+            let r = ranges.pop()!;
+            while (true) {
+                const i = ranges.findIndex((o) => o.intersects(r));
+                if (i === -1) break;
+                r = r.union(ranges.splice(i, 1)[0])!;
+            }
+            merged.push(r);
+        }
+        return new RangeSet(merged);
     }
 
     copy() {

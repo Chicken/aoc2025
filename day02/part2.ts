@@ -1,7 +1,7 @@
 import { Range } from "@/Range.ts";
 
 const input = Deno.readTextFileSync("input").trim().split(",")
-    .map((p) => p.split("-").map(Number)).map(([s, e]) => new Range(s, e + 1));
+    .map((p) => new Range(...p.split("-").map(Number) as [number, number]));
 
 let sum = 0;
 
