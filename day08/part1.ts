@@ -1,0 +1,30 @@
+import { product } from "@/array.ts";
+
+const input = Deno.readTextFileSync("input").trim().split("\n").map((l) => l.trim().split(",").map(Number));
+const edges: number[][] = [];
+
+for (let i = 0; i < input.length; i++) {
+    for (let j = i + 1; j < input.length; j++) {
+        const a = input[i]!;
+        const b = input[j]!;
+        edges.push([i, j, Math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2)]);
+    }
+}
+
+edges.sort((a, b) => b[2] - a[2]);
+const circuits: number[][] = [];
+
+for (let i = 0; i < 1000; i++) {
+    const [a, b] = edges.pop()!;
+    const aCircuit = circuits.find((c) => c.includes(a));
+    const bCircuit = circuits.find((c) => c.includes(b));
+    if (aCircuit && aCircuit === bCircuit) continue;
+    if (aCircuit && bCircuit) {
+        circuits.splice(circuits.indexOf(bCircuit), 1);
+        aCircuit.push(...bCircuit);
+    } else if (aCircuit) aCircuit.push(b);
+    else if (bCircuit) bCircuit.push(a);
+    else circuits.push([a, b]);
+}
+
+console.log(product(circuits.sort((a, b) => b.length - a.length).slice(0, 3).map((a) => a.length)));
