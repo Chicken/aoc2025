@@ -1,0 +1,10 @@
+{
+  "name": "d10p2",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "part2.js",
+  "dependencies": {
+    "z3-solver": "^4.15.4"
+  }
+}
