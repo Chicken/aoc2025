@@ -15,7 +15,6 @@ for (const line of rawInput) {
 }
 
 let sum = 0;
-let it = 0;
 
 for (const machine of input) {
     let min = Infinity;
@@ -33,28 +32,14 @@ for (const machine of input) {
         solver.add(Z3.Sum(...sum).eq(machine.joltage[i]));
     }
 
-    let sols = 0;
-    let sol = null;
-
-    while (true) {
-        const res = await solver.check();
-        if (res === "unsat") break;
-
+    while (await solver.check() === "sat") {
         const model = solver.model();
-
         const values = variables.map((v) => parseInt(model.get(v).toString(), 10));
-        sols++;
-
-        solver.add(Z3.Not(Z3.And(...variables.map((v, i) => v.eq(values[i])))));
 
         const total = values.reduce((a, c) => a + c, 0);
-        if (total < min) {
-            min = total;
-            sol = values;
-        }
+        solver.add(Z3.Sum(...variables).lt(total));
+        min = total;
     }
-
-    console.log("it", ++it, "had", sols, "solutions, best:", sol.join(","));
 
     sum += min;
 }
